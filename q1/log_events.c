@@ -181,3 +181,42 @@ static void add_event_interactive(EventLog *log){
 static void print_help(void){
     puts("Commands: n - next, p - previous, a - add event, c - current, x - clear, q - save and quit");
 }
+
+/* Main function */
+int main(void){
+    EventLog log;
+    char line[64];
+    log_init(&log);
+    print_help();
+
+    for (;;){
+        if (!read_line("> ", line, sizeof line))
+            line[0] = 'q', line[1] = '\0';
+        if (line[0] == '\0' || line[1] != '\0') {
+            if (line[0] != '\0')
+                puts("Invalid command.");
+            print_help();
+            continue;
+        }
+        switch (line[0]){
+        case 'n': go_next(&log); break;
+        case 'p': go_prev(&log); break;
+        case 'a': add_event_interactive(&log); break;
+        case 'c': show_current(&log); break;
+        case 'x':
+            log_clear(&log);
+            puts("Event log cleared.");
+            break;
+        case 'q':
+            if (save_session(&log) == 0)
+                puts("Session saved.");
+            else
+                puts("Failed to save session.");
+            log_clear(&log);
+            return 0;
+        default:
+            puts("Unknown command.");
+            print_help();
+        }
+    }
+}
