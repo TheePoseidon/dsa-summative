@@ -1,0 +1,1 @@
+# Embedded Firmware Log Compression Utility
