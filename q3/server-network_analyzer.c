@@ -8,7 +8,7 @@
 
 typedef struct Edge {
     struct Vertex *to;
-    struct Edge   *next;
+    struct Edge *next;
 } Edge;
 
 typedef struct Vertex {
@@ -61,15 +61,15 @@ static AddResult graph_add_vertex(Graph *g, const char *name){
     Vertex *v = malloc(sizeof *v);
     if (v == NULL)
         return ADD_NO_MEMORY;
-    snprintf(v->name, sizeof v->name, "%s", name);
-    v->out = NULL;
-    v->next = NULL;
+    snprintf(v -> name, sizeof v -> name, "%s", name);
+    v -> out = NULL;
+    v -> next = NULL;
 
     Vertex **link = &g->head;
     while (*link != NULL)
-        link = &(*link)->next;
+        link = &(*link) -> next;
     *link = v;
-    g->count++;
+    g -> count++;
     return ADD_OK;
 }
 static EdgeResult graph_add_edge(Vertex *from, Vertex *to){
@@ -81,20 +81,20 @@ static EdgeResult graph_add_edge(Vertex *from, Vertex *to){
     Edge *e = malloc(sizeof *e);
     if (e == NULL)
         return EDGE_NO_MEMORY;
-    e->to = to;
-    e->next = NULL;
+    e -> to = to;
+    e -> next = NULL;
 
-    Edge **link = &from->out;
+    Edge **link = &from -> out;
     while (*link != NULL)
-        link = &(*link)->next;
+        link = &(*link) -> next;
     *link = e;
     return EDGE_OK;
 }
 static int graph_remove_edge(Vertex *from, const Vertex *to){
     for (Edge **link = &from->out; *link != NULL; link = &(*link)->next) {
-        if ((*link)->to == to) {
+        if ((*link) -> to == to) {
             Edge *dead = *link;
-            *link = dead->next;
+            *link = dead -> next;
             free(dead);
             return 1;
         }
@@ -105,7 +105,7 @@ static int graph_remove_edge(Vertex *from, const Vertex *to){
 static int free_edges(Edge *e){
     int n = 0;
     while (e != NULL) {
-        Edge *next = e->next;
+        Edge *next = e-> next;
         free(e);
         e = next;
         n++;
@@ -114,35 +114,35 @@ static int free_edges(Edge *e){
 }
 
 static int graph_remove_vertex(Graph *g, const char *name){
-    Vertex **link = &g->head;
-    while (*link != NULL && !names_equal((*link)->name, name))
-        link = &(*link)->next;
+    Vertex **link = &g -> head;
+    while (*link != NULL && !names_equal((*link) -> name, name))
+        link = &(*link) -> next;
     if (*link == NULL)
         return -1;
 
     Vertex *victim = *link;
-    *link = victim->next;
-    g->count--;
+    *link = victim -> next;
+    g -> count--;
 
     int removed = 0;
-    for (Vertex *v = g->head; v != NULL; v = v->next)
+    for (Vertex *v = g -> head; v != NULL; v = v -> next)
         removed += graph_remove_edge(v, victim);
-    removed += free_edges(victim->out);
+    removed += free_edges(victim -> out);
 
     free(victim);
     return removed;
 }
 
 static void graph_destroy(Graph *g){
-    Vertex *v = g->head;
+    Vertex *v = g -> head;
     while (v != NULL) {
-        Vertex *next = v->next;
-        free_edges(v->out);
+        Vertex *next = v -> next;
+        free_edges(v -> out);
         free(v);
         v = next;
     }
-    g->head = NULL;
-    g->count = 0;
+    g -> head = NULL;
+    g -> count = 0;
 }
 
 static int index_of(const Graph *g, const Vertex *target){
@@ -238,10 +238,10 @@ static const char *name_error(const char *s){
     if (n == 0)
         return "name cannot be empty";
     if (n > MAX_NAME - 1)
-        return "name too long (max 49 characters)";
+        return "name too long ";
     for (; *s != '\0'; s++)
         if (!isprint((unsigned char)*s))
-            return "name contains non-printable characters";
+            return "name contains invalid characters";
     return NULL;
 }
 static NameStatus prompt_name(const char *prompt, char *out){
@@ -253,7 +253,7 @@ static NameStatus prompt_name(const char *prompt, char *out){
         return NAME_EOF;
     }
     if (rs == READ_TOO_LONG) {
-        puts("Invalid input: name too long (max 49 characters).");
+        puts("Invalid input: name too long.");
         return NAME_INVALID;
     }
 
@@ -268,7 +268,7 @@ static NameStatus prompt_name(const char *prompt, char *out){
 }
 
 static int report_if_empty(const Graph *g){
-    if (g->count == 0) {
+    if (g -> count == 0) {
         puts("The graph is empty. Use 'a' to add a server.");
         return 1;
     }
@@ -282,7 +282,7 @@ static void cmd_add_server(Graph *g){
 
     switch (graph_add_vertex(g, name)) {
     case ADD_OK:
-        printf("Server '%s' added (%d total).\n", name, g->count);
+        printf("Server '%s' added (%d total).\n", name, g -> count);
         break;
     case ADD_DUPLICATE:
         printf("Server '%s' already exists. Nothing added.\n", name);
@@ -308,7 +308,7 @@ static void cmd_remove_server(Graph *g){
     }
 
     char canonical[MAX_NAME];
-    snprintf(canonical, sizeof canonical, "%s", v->name);
+    snprintf(canonical, sizeof canonical, "%s", v -> name);
 
     int removed = graph_remove_vertex(g, canonical);
     printf("Server '%s' removed along with %d related dependenc%s.\n",
@@ -341,11 +341,11 @@ static void cmd_create_dependency(Graph *g){
 
     switch (graph_add_edge(from, to)) {
     case EDGE_OK:
-        printf("Dependency created: %s -> %s.\n", from->name, to->name);
+        printf("Dependency created: %s -> %s.\n", from -> name, to -> name);
         break;
     case EDGE_DUPLICATE:
         printf("Dependency %s -> %s already exists. Nothing added.\n",
-               from->name, to->name);
+               from -> name, to -> name);
         break;
     case EDGE_SELF:
         puts("A server cannot depend on itself.");
