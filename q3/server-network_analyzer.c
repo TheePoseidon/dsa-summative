@@ -1,10 +1,10 @@
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+# include <ctype.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <string.h>
 
-#define MAX_NAME 50
-#define INPUT_BUF 128
+# define MAX_NAME 50
+# define INPUT_BUF 128
 
 typedef struct Edge {
     struct Vertex *to;
@@ -27,13 +27,11 @@ typedef enum { EDGE_OK, EDGE_DUPLICATE, EDGE_SELF, EDGE_NO_MEMORY } EdgeResult;
 typedef enum { READ_OK, READ_EOF, READ_TOO_LONG } ReadStatus;
 typedef enum { NAME_OK, NAME_INVALID, NAME_EOF } NameStatus;
 
-static void graph_init(Graph *g)
-{
-    g->head = NULL;
-    g->count = 0;
+static void graph_init(Graph *g){
+    g -> head = NULL;
+    g -> count = 0;
 }
-static int names_equal(const char *a, const char *b)
-{
+static int names_equal(const char *a, const char *b){
     while (*a != '\0' && *b != '\0') {
         if (tolower((unsigned char)*a) != tolower((unsigned char)*b))
             return 0;
@@ -43,23 +41,20 @@ static int names_equal(const char *a, const char *b)
     return *a == *b;
 }
 
-static Vertex *find_vertex(const Graph *g, const char *name)
-{
+static Vertex *find_vertex(const Graph *g, const char *name){
     for (Vertex *v = g->head; v != NULL; v = v->next)
         if (names_equal(v->name, name))
             return v;
     return NULL;
 }
 
-static int has_edge(const Vertex *from, const Vertex *to)
-{
-    for (const Edge *e = from->out; e != NULL; e = e->next)
-        if (e->to == to)
+static int has_edge(const Vertex *from, const Vertex *to){
+    for (const Edge *e = from -> out; e != NULL; e = e-> next)
+        if (e -> to == to)
             return 1;
     return 0;
 }
-static AddResult graph_add_vertex(Graph *g, const char *name)
-{
+static AddResult graph_add_vertex(Graph *g, const char *name){
     if (find_vertex(g, name) != NULL)
         return ADD_DUPLICATE;
 
@@ -77,8 +72,7 @@ static AddResult graph_add_vertex(Graph *g, const char *name)
     g->count++;
     return ADD_OK;
 }
-static EdgeResult graph_add_edge(Vertex *from, Vertex *to)
-{
+static EdgeResult graph_add_edge(Vertex *from, Vertex *to){
     if (from == to)
         return EDGE_SELF;
     if (has_edge(from, to))
@@ -96,8 +90,7 @@ static EdgeResult graph_add_edge(Vertex *from, Vertex *to)
     *link = e;
     return EDGE_OK;
 }
-static int graph_remove_edge(Vertex *from, const Vertex *to)
-{
+static int graph_remove_edge(Vertex *from, const Vertex *to){
     for (Edge **link = &from->out; *link != NULL; link = &(*link)->next) {
         if ((*link)->to == to) {
             Edge *dead = *link;
@@ -109,8 +102,7 @@ static int graph_remove_edge(Vertex *from, const Vertex *to)
     return 0;
 }
 
-static int free_edges(Edge *e)
-{
+static int free_edges(Edge *e){
     int n = 0;
     while (e != NULL) {
         Edge *next = e->next;
@@ -121,8 +113,7 @@ static int free_edges(Edge *e)
     return n;
 }
 
-static int graph_remove_vertex(Graph *g, const char *name)
-{
+static int graph_remove_vertex(Graph *g, const char *name){
     Vertex **link = &g->head;
     while (*link != NULL && !names_equal((*link)->name, name))
         link = &(*link)->next;
@@ -142,8 +133,7 @@ static int graph_remove_vertex(Graph *g, const char *name)
     return removed;
 }
 
-static void graph_destroy(Graph *g)
-{
+static void graph_destroy(Graph *g){
     Vertex *v = g->head;
     while (v != NULL) {
         Vertex *next = v->next;
@@ -155,8 +145,7 @@ static void graph_destroy(Graph *g)
     g->count = 0;
 }
 
-static int index_of(const Graph *g, const Vertex *target)
-{
+static int index_of(const Graph *g, const Vertex *target){
     int i = 0;
     for (const Vertex *v = g->head; v != NULL; v = v->next, i++)
         if (v == target)
@@ -164,8 +153,7 @@ static int index_of(const Graph *g, const Vertex *target)
     return -1;
 }
 
-static unsigned char *build_matrix(const Graph *g)
-{
+static unsigned char *build_matrix(const Graph *g){
     int n = g->count;
     unsigned char *m = calloc((size_t)n * (size_t)n, 1);
     if (m == NULL)
@@ -178,8 +166,7 @@ static unsigned char *build_matrix(const Graph *g)
     return m;
 }
 
-static void print_matrix(const Graph *g)
-{
+static void print_matrix(const Graph *g){
     int n = g->count;
     unsigned char *m = build_matrix(g);
     if (m == NULL) {
@@ -194,7 +181,7 @@ static void print_matrix(const Graph *g)
             w = len;
     }
 
-    puts("Adjacency matrix (row depends on column; 1 = direct dependency):\n");
+    puts("Adjacency matrix:\n");
 
     printf("%*s", w + 6, "");
     for (int j = 0; j < n; j++)
@@ -216,8 +203,7 @@ static void print_matrix(const Graph *g)
     free(m);
 }
 
-static ReadStatus read_line(const char *prompt, char *buf, size_t size)
-{
+static ReadStatus read_line(const char *prompt, char *buf, size_t size){
     fputs(prompt, stdout);
     fflush(stdout);
     if (fgets(buf, (int)size, stdin) == NULL) {
@@ -238,8 +224,7 @@ static ReadStatus read_line(const char *prompt, char *buf, size_t size)
     return READ_TOO_LONG;
 }
 
-static char *trim(char *s)
-{
+static char *trim(char *s){
     while (*s != '\0' && isspace((unsigned char)*s))
         s++;
     size_t n = strlen(s);
@@ -248,8 +233,7 @@ static char *trim(char *s)
     return s;
 }
 
-static const char *name_error(const char *s)
-{
+static const char *name_error(const char *s){
     size_t n = strlen(s);
     if (n == 0)
         return "name cannot be empty";
@@ -260,8 +244,7 @@ static const char *name_error(const char *s)
             return "name contains non-printable characters";
     return NULL;
 }
-static NameStatus prompt_name(const char *prompt, char *out)
-{
+static NameStatus prompt_name(const char *prompt, char *out){
     char buf[INPUT_BUF];
     ReadStatus rs = read_line(prompt, buf, sizeof buf);
 
@@ -284,8 +267,7 @@ static NameStatus prompt_name(const char *prompt, char *out)
     return NAME_OK;
 }
 
-static int report_if_empty(const Graph *g)
-{
+static int report_if_empty(const Graph *g){
     if (g->count == 0) {
         puts("The graph is empty. Use 'a' to add a server.");
         return 1;
@@ -293,8 +275,7 @@ static int report_if_empty(const Graph *g)
     return 0;
 }
 
-static void cmd_add_server(Graph *g)
-{
+static void cmd_add_server(Graph *g){
     char name[MAX_NAME];
     if (prompt_name("Server name: ", name) != NAME_OK)
         return;
@@ -312,8 +293,7 @@ static void cmd_add_server(Graph *g)
     }
 }
 
-static void cmd_remove_server(Graph *g)
-{
+static void cmd_remove_server(Graph *g){
     if (report_if_empty(g))
         return;
 
@@ -334,8 +314,7 @@ static void cmd_remove_server(Graph *g)
     printf("Server '%s' removed along with %d related dependenc%s.\n",
            canonical, removed, removed == 1 ? "y" : "ies");
 }
-static int read_dependency(const Graph *g, Vertex **from, Vertex **to)
-{
+static int read_dependency(const Graph *g, Vertex **from, Vertex **to){
     char a[MAX_NAME], b[MAX_NAME];
 
     if (prompt_name("Dependent server (the one that needs another): ", a) != NAME_OK)
@@ -352,8 +331,7 @@ static int read_dependency(const Graph *g, Vertex **from, Vertex **to)
     return *from != NULL && *to != NULL;
 }
 
-static void cmd_create_dependency(Graph *g)
-{
+static void cmd_create_dependency(Graph *g){
     if (report_if_empty(g))
         return;
 
@@ -378,8 +356,7 @@ static void cmd_create_dependency(Graph *g)
     }
 }
 
-static void cmd_delete_dependency(Graph *g)
-{
+static void cmd_delete_dependency(Graph *g){
     if (report_if_empty(g))
         return;
 
@@ -393,8 +370,7 @@ static void cmd_delete_dependency(Graph *g)
         printf("No dependency %s -> %s exists.\n", from->name, to->name);
 }
 
-static void cmd_query(const Graph *g)
-{
+static void cmd_query(const Graph *g){
     if (report_if_empty(g))
         return;
 
@@ -429,15 +405,13 @@ static void cmd_query(const Graph *g)
         puts("  (none)");
 }
 
-static void cmd_matrix(const Graph *g)
-{
+static void cmd_matrix(const Graph *g){
     if (report_if_empty(g))
         return;
     print_matrix(g);
 }
 
-static void print_help(void)
-{
+static void print_help(void){
     puts("Commands: a=add server  r=remove server  c=create dependency  "
          "d=delete dependency  q=query server  m=matrix  x=exit");
 }
@@ -457,8 +431,7 @@ static const char *const INITIAL_DEPENDENCIES[][2] = {
     { "Database Server", "Backup Server" }
 };
 
-static int build_initial_graph(Graph *g)
-{
+static int build_initial_graph(Graph *g){
     for (size_t i = 0; i < sizeof INITIAL_SERVERS / sizeof INITIAL_SERVERS[0]; i++)
         if (graph_add_vertex(g, INITIAL_SERVERS[i]) != ADD_OK)
             return 0;
@@ -472,8 +445,7 @@ static int build_initial_graph(Graph *g)
     return 1;
 }
 
-int main(void)
-{
+int main(void){
     Graph g;
     graph_init(&g);
 
