@@ -672,7 +672,7 @@ static char *trim(char *s){
 }
 
 static void print_menu(void){
-    puts("\n=== Diagnostic Log Compressor (Huffman) ===");
+    puts("\n Diagnostic Log Compressor");
     puts("1. Compress log");
     puts("2. Decompress log");
     puts("3. Verify restored log");
