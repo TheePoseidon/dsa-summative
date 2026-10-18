@@ -450,7 +450,7 @@ int main(void){
     graph_init(&g);
 
     if (!build_initial_graph(&g)) {
-        puts("Error: could not build the initial graph (out of memory).");
+        puts("Error:(out of memory).");
         graph_destroy(&g);
         return 1;
     }
