@@ -1,3 +1,4 @@
+# define _POSIX_C_SOURCE 200809L
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
@@ -7,7 +8,6 @@
 # define MAX_EVENTS 25
 # define FIELD_LEN 32
 # define SAVE_FILE "log_events.txt"
-# define _POSIX_C_SOURCE 200809L
 
 typedef struct Event {
     int id;

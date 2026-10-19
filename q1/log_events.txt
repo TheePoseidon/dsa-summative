@@ -1,0 +1,4 @@
+# Event Log Session(3 events)
+ID: 1 | Type: Temp | Sensor: 123 | Time: 2026-10-19 08:14:18 | Severity: 4
+ID: 2 | Type: Low battery | Sensor: 789 | Time: 2026-10-19 08:15:03 | Severity: 5
+ID: 3 | Type: Sensor failure | Sensor: 456 | Time: 2026-10-19 08:15:32 | Severity: 1
