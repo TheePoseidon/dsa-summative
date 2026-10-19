@@ -132,16 +132,14 @@ static void graph_destroy(Graph *g){
     graph_init(g);
 }
 
-static int graph_find(const Graph *g, const char *name)
-{
+static int graph_find(const Graph *g, const char *name){
     for (int i = 0; i < g->count; i++)
         if (names_equal(g->loc[i].name, name))
             return i;
     return -1;
 }
 
-static int graph_add_location(Graph *g, const char *name)
-{
+static int graph_add_location(Graph *g, const char *name){
     if (g->count >= MAX_LOCATIONS)
         return -1;
     if (g->count == g->cap) {
@@ -159,23 +157,20 @@ static int graph_add_location(Graph *g, const char *name)
 }
 
 
-static int graph_road_km(const Graph *g, int a, int b)
-{
+static int graph_road_km(const Graph *g, int a, int b){
     for (const Road *r = g->loc[a].roads; r != NULL; r = r->next)
         if (r->to == b)
             return r->km;
     return -1;
 }
 
-static void append_road(Road **head, Road *r)
-{
+static void append_road(Road **head, Road *r){
     while (*head != NULL)
         head = &(*head)->next;
     *head = r;
 }
 
-static RoadResult graph_add_road(Graph *g, const char *name_a, const char *name_b, long km)
-{
+static RoadResult graph_add_road(Graph *g, const char *name_a, const char *name_b, long km){
     if (km < 1 || km > MAX_ROAD_KM)
         return ROAD_BAD_DISTANCE;
     if (names_equal(name_a, name_b))
@@ -214,8 +209,7 @@ static RoadResult graph_add_road(Graph *g, const char *name_a, const char *name_
     append_road(&g->loc[b].roads, rb);
     return ROAD_OK;
 }
-static int load_road_line(Graph *g, const char *line, char *err, size_t errsz)
-{
+static int load_road_line(Graph *g, const char *line, char *err, size_t errsz){
     char buf[INPUT_BUF];
     snprintf(buf, sizeof buf, "%s", line);
 
@@ -278,15 +272,13 @@ static int load_road_line(Graph *g, const char *line, char *err, size_t errsz)
     }
 }
 
-static void load_default_network(Graph *g)
-{
+static void load_default_network(Graph *g){
     char err[128];
     for (size_t i = 0; i < sizeof DEFAULT_ROADS / sizeof DEFAULT_ROADS[0]; i++)
         if (!load_road_line(g, DEFAULT_ROADS[i], err, sizeof err))
             printf("Internal error loading built-in road %zu: %s\n", i + 1, err);
 }
-static int load_network_file(Graph *g, const char *path)
-{
+static int load_network_file(Graph *g, const char *path){
     FILE *f = fopen(path, "r");
     if (f == NULL) {
         printf("Error: cannot open '%s': %s\n", path, strerror(errno));
@@ -325,8 +317,7 @@ static int load_network_file(Graph *g, const char *path)
     return 1;
 }
 
-static int dijkstra(const Graph *g, int src, int dst, long long *dist, int *prev)
-{
+static int dijkstra(const Graph *g, int src, int dst, long long *dist, int *prev){
     int n = g->count;
     char *done = calloc((size_t)n, 1);
     if (done == NULL)
@@ -359,8 +350,7 @@ static int dijkstra(const Graph *g, int src, int dst, long long *dist, int *prev
     free(done);
     return 1;
 }
-static int build_path(const int *prev, int dst, int **out)
-{
+static int build_path(const int *prev, int dst, int **out){
     int len = 0;
     for (int v = dst; v != -1; v = prev[v])
         len++;
@@ -376,23 +366,20 @@ static int build_path(const int *prev, int dst, int **out)
     return len;
 }
 
-static void route_clear(Route *r)
-{
+static void route_clear(Route *r){
     free(r->stops);
     r->stops = NULL;
     r->len = 0;
     r->total = 0;
 }
 
-static void print_route_names(const Graph *g, const int *stops, int len)
-{
+static void print_route_names(const Graph *g, const int *stops, int len){
     for (int i = 0; i < len; i++)
         printf("%s%s", i ? ARROW : "", g->loc[stops[i]].name);
     putchar('\n');
 }
 
-static int prompt_location(const Graph *g, const char *prompt)
-{
+static int prompt_location(const Graph *g, const char *prompt){
     char buf[INPUT_BUF];
     ReadStatus rs = read_line(stdin, prompt, buf, sizeof buf);
     if (rs == READ_EOF) {
@@ -424,8 +411,7 @@ static int prompt_location(const Graph *g, const char *prompt)
     return LOC_INVALID;
 }
 
-static void cmd_display_locations(const Graph *g)
-{
+static void cmd_display_locations(const Graph *g){
     if (g->count == 0) {
         puts("No locations are loaded.");
         return;
@@ -438,8 +424,7 @@ static void cmd_display_locations(const Graph *g)
     }
 }
 
-static void cmd_find_route(const Graph *g, Route *last)
-{
+static void cmd_find_route(const Graph *g, Route *last){
     if (g->count == 0) {
         puts("No locations are loaded.");
         return;
@@ -506,19 +491,15 @@ static void cmd_route_distance(const Graph *g, const Route *last)
     printf("Total Distance: %lld km\n", last->total);
 }
 
-static void print_menu(void)
-{
-    puts("\n=== Medical Supply Delivery Router ===");
+static void print_menu(void){
+    puts("\n Medical Supply Delivery Router");
     puts("1. Display locations");
     puts("2. Find shortest route");
     puts("3. Display route distance");
     puts("4. Exit");
 }
 
-/* ---------- main ---------- */
-
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv){
     Graph g;
     Route last = { NULL, 0, 0 };
     graph_init(&g);
