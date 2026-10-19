@@ -7,6 +7,7 @@
 # define MAX_EVENTS 25
 # define FIELD_LEN 32
 # define SAVE_FILE "log_events.txt"
+# define _POSIX_C_SOURCE 200809L
 
 typedef struct Event {
     int id;
@@ -125,7 +126,7 @@ static int save_session(const EventLog *log){
     FILE *f = fopen(SAVE_FILE, "w");
     if (f == NULL)
         return -1;
-    fprintf(f, "# Event Log Session\n", log -> count);
+    fprintf(f, "# Event Log Session(%d events)\n", log -> count);
     for (const Event *e  = log -> head; e != NULL; e = e -> next)
         format_event(e, f);
     fclose(f);
