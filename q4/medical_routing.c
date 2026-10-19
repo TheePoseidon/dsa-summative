@@ -6,7 +6,7 @@
 # include <string.h>
 
 # define MAX_NAME 50
-# define MAX_LOCATION 1000
+# define MAX_LOCATIONS 1000
 # define MAX_ROAD_KM 100000
 # define INPUT_BUF 256
 # define INF LLONG_MAX
